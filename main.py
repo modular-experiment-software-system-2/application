@@ -7,7 +7,11 @@ import yaml
 
 from modules.common import *
 from modules.settings import Settings
-from modules.device import Device
+from modules.device import (
+    Device,
+    WorkerDevicesROS2LocalStart,
+    WorkerDevicesROS2LocalStop
+)
 from modules.ui import Ui_MainWindow
 from modules.other.ui_tileDiagnosticsPage import Ui_tileDiagnosticsPage
 from widgets import custom_grips as Ui_Grips
@@ -59,6 +63,7 @@ class MainWindow(QMainWindow):
 
 
         # EXPERIMENT STATE ATTRIBUTES
+        self.ros2_local_status: int = 0             # 0: not active; 1: active
         self.is_experiment_running: bool = False
 
         # EXPERIMENT FILE ATTRIBUTES
@@ -213,7 +218,22 @@ class MainWindow(QMainWindow):
     def clickROS2LocalLaunchShutdown(self):
         """
         """
-        print("clicked ROS2 Local Launch/Shutdown")
+        if not self.devices_local:
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to start local ros2 nodes because no local devices are loaded")
+            return
+
+        if self.ros2_local_status == 0:
+            Ui_Functions.diagnosticsConsoleLog(self, "launching local ROS2 nodes")
+            worker = WorkerDevicesROS2LocalStart(self.devices_local)
+            self.threadpool.start(worker)
+            WIDGETS.buttonROS2LocalLaunchShutdown.setText("Shutdown Local ROS2 Nodes")
+            self.ros2_local_status = 1
+        elif self.ros2_local_status == 1:
+            Ui_Functions.diagnosticsConsoleLog(self, "shutting down local ROS2 nodes")
+            worker = WorkerDevicesROS2LocalStop(self.devices_local)
+            self.threadpool.start(worker)
+            WIDGETS.buttonROS2LocalLaunchShutdown.setText("Launch Local ROS2 Nodes")
+            self.ros2_local_status = 0
 
 
     def clickNetworkRemoteConnectDisconnect(self):
