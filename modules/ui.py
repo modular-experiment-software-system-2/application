@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'main2LXfhoa.ui'
+## Form generated from reading UI file 'main2spAxlO.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.4.2
 ##
@@ -1937,11 +1937,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_23.setObjectName(u"verticalLayout_23")
         self.buttonNetworkRemoteConnectDisconnect = QPushButton(self.diagnosticsMenu1ExperimentRemoteOpsButtons)
         self.buttonNetworkRemoteConnectDisconnect.setObjectName(u"buttonNetworkRemoteConnectDisconnect")
+        self.buttonNetworkRemoteConnectDisconnect.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.verticalLayout_23.addWidget(self.buttonNetworkRemoteConnectDisconnect)
 
         self.buttonROS2RemoteLaunchShutdown = QPushButton(self.diagnosticsMenu1ExperimentRemoteOpsButtons)
         self.buttonROS2RemoteLaunchShutdown.setObjectName(u"buttonROS2RemoteLaunchShutdown")
+        self.buttonROS2RemoteLaunchShutdown.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.verticalLayout_23.addWidget(self.buttonROS2RemoteLaunchShutdown)
 
@@ -2022,13 +2024,13 @@ class Ui_MainWindow(object):
         self.diagnosticsTilesMenu.setObjectName(u"diagnosticsTilesMenu")
         self.diagnosticsTilesMenu.setMinimumSize(QSize(0, 43))
         self.diagnosticsTilesMenu.setMaximumSize(QSize(16777215, 43))
-        self.diagnosticsTilesMenu.setStyleSheet(u"#diagnosticsSubmenu2 {\n"
+        self.diagnosticsTilesMenu.setStyleSheet(u"#diagnosticsTilesMenu {\n"
 "background-color: rgb(21, 23, 27);\n"
 "}\n"
-"#diagnosticsSubmenu2 .QFrame {\n"
+"#diagnosticsTilesMenu .QFrame {\n"
 "background: transparent;\n"
 "}\n"
-"#diagnosticsSubmenu2 .QPushButton { \n"
+"#diagnosticsTilesMenu .QPushButton { \n"
 "background-color: transparent;\n"
 "border: None;\n"
 "border-radius: 0;\n"
@@ -2038,7 +2040,7 @@ class Ui_MainWindow(object):
 "padding: 0 18px 0 18px;\n"
 "text-align: center;\n"
 "}\n"
-"#diagnosticsSubmenu2 .QPushButton:pressed { \n"
+"#diagnosticsTilesMenu .QPushButton:pressed { \n"
 "color: rgb(255, 255, 255);\n"
 "}")
         self.diagnosticsTilesMenu.setFrameShape(QFrame.NoFrame)
@@ -2213,7 +2215,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.stackedWidget.setCurrentIndex(2)
-        self.diagnosticsTilesDefaultPage.setCurrentIndex(1)
+        self.diagnosticsTilesDefaultPage.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -2350,6 +2352,6 @@ class Ui_MainWindow(object):
         self.buttonExperimentRunAbort.setText(QCoreApplication.translate("MainWindow", u"Run Experiment", None))
         self.buttonDiagnosticsRefresh.setText(QCoreApplication.translate("MainWindow", u"Refresh", None))
         self.creditsLabel.setText(QCoreApplication.translate("MainWindow", u"Marina J. Nelson", None))
-        self.version.setText(QCoreApplication.translate("MainWindow", u"v1.1.0", None))
+        self.version.setText(QCoreApplication.translate("MainWindow", u"v0.2.1", None))
     # retranslateUi
 

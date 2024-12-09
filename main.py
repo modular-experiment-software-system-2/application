@@ -210,9 +210,6 @@ class MainWindow(QMainWindow):
                 self.loadExperimentFile(experiment_file_content)
 
 
-
-
-
     def clickROS2LocalLaunchShutdown(self):
         """
         """
