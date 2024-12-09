@@ -207,7 +207,7 @@ class NetworkFunctions(SCP):
         self.remote = ROS2Remote()
 
 
-    def ping(self, ip: str):
+    def ping(self, ip: str, timeout: float = 3):
         """
         Pings a static IP address on a local network to determine whether the device with that IP is online.
         """

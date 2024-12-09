@@ -215,13 +215,26 @@ class MainWindow(QMainWindow):
                 self.loadExperimentFile(experiment_file_content)
 
 
+    def checkDevicesNetworkStatus(self, devices: List[Device]):
+        """
+        Checks a list of devices to determine whether all devices are connected to the network; assumes that worker checks/updates device statuses frequently enough that pinging the devices here is not necessary.
+        """
+        result = True
+        for device in devices:
+            if device.network.status_network == False or device.network.status_network == None:
+                result = False
+        return result
+
+
     def clickROS2LocalLaunchShutdown(self):
         """
         """
         if not self.devices_local:
             Ui_Functions.diagnosticsConsoleLog(self, "unable to start local ros2 nodes because no local devices are loaded")
             return
-
+        if not self.checkDevicesNetworkStatus(self.devices_local):
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to start local ros2 nodes because not all local devices are connected to the network")
+            return
         if self.ros2_local_status == 0:
             Ui_Functions.diagnosticsConsoleLog(self, "launching local ROS2 nodes")
             worker = WorkerDevicesROS2LocalStart(self.devices_local)
@@ -245,7 +258,8 @@ class MainWindow(QMainWindow):
     def clickROS2RemoteLaunchShutdown(self):
         """
         """
-        print("clicked ROS2 Remote Launch/Shutdown")
+        print("clicked Remote ROS2 Launch/Shutdown")
+        
 
 
 class Ui_Content():
