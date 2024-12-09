@@ -10,7 +10,9 @@ from modules.settings import Settings
 from modules.device import (
     Device,
     WorkerDevicesROS2LocalStart,
-    WorkerDevicesROS2LocalStop
+    WorkerDevicesROS2LocalStop,
+    WorkerDevicesROS2RemoteStart,
+    WorkerDevicesROS2RemoteStop,
 )
 from modules.ui import Ui_MainWindow
 from modules.other.ui_tileDiagnosticsPage import Ui_tileDiagnosticsPage
@@ -226,6 +228,17 @@ class MainWindow(QMainWindow):
         return result
 
 
+    def checkDevicesSSHStatus(self, devices: List[Device]):
+        """
+        Checks a list of devices to determine whether all devices are connected to the application via ssh; assumes that worker checks/updates device statuses frequently enough that testing the device transports is not necessary.
+        """
+        result = True
+        for device in devices:
+            if device.network.status_ssh == False or device.network.status_ssh == None:
+                result = False
+        return result
+
+
     def clickROS2LocalLaunchShutdown(self):
         """
         """
@@ -258,7 +271,27 @@ class MainWindow(QMainWindow):
     def clickROS2RemoteLaunchShutdown(self):
         """
         """
-        print("clicked Remote ROS2 Launch/Shutdown")
+        if not self.devices_remote:
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to start remote ros2 nodes because no remote devices are loaded")
+            return
+        if not self.checkDevicesNetworkStatus(self.devices_remote):
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to start remote ros2 nodes because not all remote devices are connected to the network")
+            return
+        if not self.checkDevicesSSHStatus(self.devices_remote):
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to start remote ros2 nodes because not all remote devices are connected to the application via ssh")
+            return
+        if self.ros2_remote_status == 0:
+            Ui_Functions.diagnosticsConsoleLog(self, "launching remote ROS2 nodes")
+            worker = WorkerDevicesROS2RemoteStart(self.devices_remote)
+            self.threadpool.start(worker)
+            WIDGETS.buttonROS2RemoteLaunchShutdown.setText("Shutdown Remote ROS2 Nodes")
+            self.ros2_remote_status = 1
+        elif self.ros2_remote_status == 1:
+            Ui_Functions.diagnosticsConsoleLog(self, "shutting down remote ROS2 nodes")
+            worker = WorkerDevicesROS2RemoteStop(self.devices_remote)
+            self.threadpool.start(worker)
+            WIDGETS.buttonROS2RemoteLaunchShutdown.setText("Launch Remote ROS2 Nodes")
+            self.ros2_remote_status = 0
         
 
 
