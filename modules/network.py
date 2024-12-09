@@ -141,7 +141,7 @@ class ROS2Local():
         for command in device.commands:
             command_ = command.split()
             process = subprocess.Popen(command_, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setpgrp)
-            device.logger.log(f"started pid {process.pid} on {device.name}\"{command}\"")
+            device.logger.log(f"started pid {process.pid} on {device.name} \"{command}\"")
             device.processes.append(process)
 
 
@@ -173,7 +173,7 @@ class ROS2Remote():
         for command in device.commands:
             stdin, stdout, stderr = device.network.ssh.exec_command(f"nohup zsh -c 'source ~/.zshrc && {command} > /dev/null 2>&1' & echo $!", get_pty=False)
             pid = stdout.read().decode().strip()
-            device.logger.log(f"started pid {pid} on {device.name}\"{command}\"")
+            device.logger.log(f"started pid {pid} on {device.name}\"{command} \"")
             device.pids.append(pid)
 
 
