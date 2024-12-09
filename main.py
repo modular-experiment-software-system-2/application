@@ -11,6 +11,8 @@ from modules.device import (
     Device,
     WorkerDevicesROS2LocalStart,
     WorkerDevicesROS2LocalStop,
+    WorkerDevicesSSHConnect,
+    WorkerDevicesSSHDisconnect,
     WorkerDevicesROS2RemoteStart,
     WorkerDevicesROS2RemoteStop,
 )
@@ -66,6 +68,8 @@ class MainWindow(QMainWindow):
 
         # EXPERIMENT STATE ATTRIBUTES
         self.ros2_local_status: int = 0             # 0: not active; 1: active
+        self.remote_network_status: int = 0         # 0: not connected; 1: connected
+        self.ros2_remote_status: int = 0            # 0: not active; 1: active
         self.is_experiment_running: bool = False
 
         # EXPERIMENT FILE ATTRIBUTES
@@ -265,7 +269,24 @@ class MainWindow(QMainWindow):
     def clickNetworkRemoteConnectDisconnect(self):
         """
         """
-        print("clicked Remote Connect/Disconnect")
+        if not self.devices_remote:
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to connect to remote devices because no remote devices are loaded")
+            return
+        if not self.checkDevicesNetworkStatus(self.devices_remote):
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to connect to remote devices because not all remote devices are connected to the network")
+            return
+        if self.remote_network_status == 0:
+            Ui_Functions.diagnosticsConsoleLog(self, "connecting to remote devices")
+            worker = WorkerDevicesSSHConnect(self.devices_remote)
+            self.threadpool.start(worker)
+            WIDGETS.buttonNetworkRemoteConnectDisconnect.setText("Disconnect from Remote Devices")
+            self.remote_network_status = 1
+        elif self.remote_network_status == 1:
+            Ui_Functions.diagnosticsConsoleLog(self, "disconnecting from remote devices")
+            worker = WorkerDevicesSSHDisconnect(self.devices_remote)
+            self.threadpool.start(worker)
+            WIDGETS.buttonNetworkRemoteConnectDisconnect.setText("Connect to Remote Devices")
+            self.remote_network_status = 0
 
 
     def clickROS2RemoteLaunchShutdown(self):
