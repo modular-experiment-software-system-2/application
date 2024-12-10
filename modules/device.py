@@ -619,32 +619,35 @@ class WorkerDeviceROS2RemoteStop(QRunnable):
 class WorkerDevicesROS2RemoteStart(QRunnable):
     """
     """
-    def __init__(self, devices: List[Device]):
+    def __init__(self, devices: List[Device], priority: int):
         """
         """
         super().__init__()
         self.devices = devices
+        self.priority = priority
 
 
     def run(self):
         """
         """
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(device.network.remote.start, device): device for device in self.devices if device.name != "" and device.name != None}
+            futures = {executor.submit(device.network.remote.start, device, self.priority): device for device in self.devices if device.name != "" and device.name != None}
 
 
 class WorkerDevicesROS2RemoteStop(QRunnable):
     """
     """
-    def __init__(self, devices: List[Device]):
+    def __init__(self, devices: List[Device], priority: int):
         """
         """
         super().__init__()
         self.devices = devices
+        self.priority = priority
 
 
     def run(self):
         """
         """
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(device.network.remote.stop, device): device for device in self.devices if device.name != "" and device.name != None}
+            futures = {executor.submit(device.network.remote.stop, device, self.priority): device for device in self.devices if device.name != "" and device.name != None}
+

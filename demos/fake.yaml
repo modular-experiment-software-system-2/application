@@ -1,0 +1,25 @@
+experiment:
+  name: "Fake Experiment Demo"
+  categories:
+    - "Fake"
+  # commands3:
+  #   - command: "ros2 launch mess2_logger_py logger.launch.py"
+  #     parameters:
+  #       - namespace: "turtle1"
+  #       - topics: "['/turtle1/cmd_vel', '/turtle1/color_sensor', '/turtle1/pose']"
+Fake:
+  - type: "pc"
+    name: "Marina's PC"
+    ip: "192.168.1.168"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands1:
+      - "ros2 run turtlesim turtlesim_node"
+    commands2:
+      - "ros2 run turtlesim draw_square"
+    nodes:
+      - "/turtlesim"
+      - "/draw_square"

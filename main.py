@@ -1,6 +1,8 @@
 
 from datetime import datetime
 import os
+import signal
+import subprocess
 import sys
 import time
 from typing import List
@@ -85,6 +87,8 @@ class MainWindow(QMainWindow):
         self.experiment_file_path: str = None       # absolute path to the experiment file
         self.experiment_file_content: str = None    # content of the experiment file
         self.experiment_name: str = None            # name of the experiment
+        self.experiment_commands: List[str] = []    # list of experiment commands (to be executed after device commands1 and commands2); please note that these are ONLY commands that should run on the LOCAL DESKTOP MACHINE RUNNING MESS2
+        self.experiment_processes: List[subprocess.Popen] = []      # list of processes from the experiment_commands
 
         # EXPERIMENT BACKEND
         self.experiment_section: List[Ui_Content] = []
@@ -99,11 +103,11 @@ class MainWindow(QMainWindow):
 
         self.experiment_timer_tiles_ros2 = QTimer()
         self.experiment_timer_tiles_ros2.timeout.connect(self.updateExperimentDiagnosticsROS2)
-        self.experiment_timer_tiles_ros2.start(7000)
+        self.experiment_timer_tiles_ros2.start(4000)
 
         self.experiment_timer_run_abort_button = QTimer()
         self.experiment_timer_run_abort_button.timeout.connect(self.updateExperimentRunAbort)
-        self.experiment_timer_run_abort_button.start(7000)
+        self.experiment_timer_run_abort_button.start(4000)
 
 
         #
@@ -184,6 +188,16 @@ class MainWindow(QMainWindow):
         exp = file.get("experiment", "")
         exp_name = exp.get("name", "")
         exp_categories = exp.get("categories", "")
+        # commands3 = exp.get("commands3", "")
+        # exp_commands = []
+        # for command in commands3:
+        #     command_ = command.get("command", "")
+        #     params_ = command.get("parameters", [])
+        #     for param in params_:
+        #         for key, value in param.items():
+        #             command_ += f' {key}:="{value}"'
+        #             print(command_)
+        #     exp_commands.append(command_)
 
         if file != None and exp_name == self.experiment_name:
             Ui_Functions.diagnosticsConsoleLog(self, "selected experiment file is already loaded")
@@ -194,6 +208,7 @@ class MainWindow(QMainWindow):
 
         counter = 0
         self.experiment_name = exp_name
+        # self.experiment_commands = exp_commands
         for cat in exp_categories:
             content = Ui_Content(self, cat)
             self.experiment_section.append(content)
@@ -394,13 +409,11 @@ class MainWindow(QMainWindow):
             self.ui.buttonExperimentRunAbort.setText("Run Experiment")
             if c1 == True and c2 == True and c3 == True:
                 self.is_experiment_ready = True
-                style = WIDGETS.diagnosticsMenu2.styleSheet()
-                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_NOT_READY, Settings.DIAGNOSTICS_MENU2_IS_READY)
+                style = Settings.DIAGNOSTICS_MENU2_IS_READY
                 WIDGETS.diagnosticsMenu2.setStyleSheet(style)
             else:
                 self.is_experiment_ready = False
-                style = WIDGETS.diagnosticsMenu2.styleSheet()
-                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_READY, Settings.DIAGNOSTICS_MENU2_IS_NOT_READY)
+                style = Settings.DIAGNOSTICS_MENU2_IS_NOT_READY
                 WIDGETS.diagnosticsMenu2.setStyleSheet(style)
         # toc = time.time()
         # print(toc-tic) time on marina's pc is about 0.00040149688720703125
@@ -409,7 +422,7 @@ class MainWindow(QMainWindow):
     def clickExperimentRunAbort(self):
         """
         """
-        if self.is_experiment_ready == True:
+        if self.is_experiment_ready == True and self.is_experiment_running == False:
             self.is_experiment_running = True
             Ui_Functions.diagnosticsConsoleLog(self, "running experiment")
             style = WIDGETS.diagnosticsMenu2.styleSheet()
@@ -424,9 +437,13 @@ class MainWindow(QMainWindow):
             Ui_Functions.diagnosticsConsoleLog(self, "starting remote ros2 experiment nodes")
             worker = WorkerDevicesROS2RemoteStart(self.devices_remote, 2)
             self.threadpool.start(worker)
-            
 
-            Ui_Functions.diagnosticsConsoleLog(self, "todo -> add command to run experiment -specific launch files (add to header of experiment file)")
+            Ui_Functions.diagnosticsConsoleLog(self, "starting experiment-specific commands")
+            for command in self.experiment_commands:
+                command_ = command.split()
+                process = subprocess.Popen(command_, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setpgrp)
+                Ui_Functions.diagnosticsConsoleLog(self, f"started pid {process.pid} \"{command}\"")
+                self.experiment_processes.append(process)
 
         elif self.is_experiment_running == True:
             self.is_experiment_running = False
@@ -444,8 +461,14 @@ class MainWindow(QMainWindow):
             worker = WorkerDevicesROS2RemoteStop(self.devices_remote, 2)
             self.threadpool.start(worker)
 
-
-            Ui_Functions.diagnosticsConsoleLog(self, "todo -> add command to shutdown experiment -specific launch files (add to header of experiment file)")
+            Ui_Functions.diagnosticsConsoleLog(self, "shutting down experiment-specific commands")
+            removable = []
+            for process in self.experiment_processes:
+                os.killpg(process.pid, signal.SIGTERM)
+                Ui_Functions.diagnosticsConsoleLog(self, f"stopped pid {process.pid}")
+                removable.append(process)
+            for process in removable:
+                self.experiment_processes.remove(process)
 
         elif self.is_experiment_ready == False:
             Ui_Functions.diagnosticsConsoleLog(self, "unable to run experiment before experiment is ready")
