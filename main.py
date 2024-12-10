@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
 
         # EXPERIMENT BACKEND
         self.experiment_section: List[Ui_Content] = []
-        self.devices_offline: List[Device] = []
+        self.devices_offline: List[Device] = []         # starting/stopping ros2 not supported currently for offline devices (i.e., nodes running on local machine that do not need ip info)
         self.devices_local: List[Device] = []
         self.devices_remote: List[Device] = []
 
@@ -410,14 +410,22 @@ class MainWindow(QMainWindow):
         """
         if self.is_experiment_ready == True:
             self.is_experiment_running = True
-            Ui_Functions.diagnosticsConsoleLog(self, "starting experiment")
+            Ui_Functions.diagnosticsConsoleLog(self, "running experiment")
             style = WIDGETS.diagnosticsMenu2.styleSheet()
             style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_READY, Settings.DIAGNOSTICS_MENU2_IS_RUNNING)
             WIDGETS.diagnosticsMenu2.setStyleSheet(style)
             self.ui.buttonExperimentRunAbort.setText("Terminate Experiment")
+
+            Ui_Functions.diagnosticsConsoleLog(self, "starting local ros2 experiment nodes")
+            worker = WorkerDevicesROS2LocalStart(self.devices_local, 2)
+            self.threadpool.start(worker)
+
+            Ui_Functions.diagnosticsConsoleLog(self, "starting remote ros2 experiment nodes")
+            worker = WorkerDevicesROS2RemoteStart(self.devices_remote, 2)
+            self.threadpool.start(worker)
             
 
-            Ui_Functions.diagnosticsConsoleLog(self, "EXPERIMENT RUNNING PLACEHOLDER")
+            Ui_Functions.diagnosticsConsoleLog(self, "todo -> add command to run experiment -specific launch files (add to header of experiment file)")
 
         elif self.is_experiment_running == True:
             self.is_experiment_running = False
@@ -427,7 +435,16 @@ class MainWindow(QMainWindow):
             WIDGETS.diagnosticsMenu2.setStyleSheet(style)
             self.ui.buttonExperimentRunAbort.setText("Run Experiment")
 
-            Ui_Functions.diagnosticsConsoleLog(self, "EXPERIMENT RUNNING PLACEHOLDER")
+            Ui_Functions.diagnosticsConsoleLog(self, "shutting down local ros2 experiment nodes")
+            worker = WorkerDevicesROS2LocalStop(self.devices_local, 2)
+            self.threadpool.start(worker)
+
+            Ui_Functions.diagnosticsConsoleLog(self, "shutting down remote ros2 experiment nodes")
+            worker = WorkerDevicesROS2RemoteStop(self.devices_remote, 2)
+            self.threadpool.start(worker)
+
+
+            Ui_Functions.diagnosticsConsoleLog(self, "todo -> add command to shutdown experiment -specific launch files (add to header of experiment file)")
 
         elif self.is_experiment_ready == False:
             Ui_Functions.diagnosticsConsoleLog(self, "unable to run experiment before experiment is ready")
