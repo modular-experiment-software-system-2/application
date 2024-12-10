@@ -16,6 +16,7 @@ from modules.device import (
     WorkerDevicesROS2RemoteStart,
     WorkerDevicesROS2RemoteStop,
     WorkerDeviceUi,
+    WorkerROS2Ui,
 
 )
 from modules.ui import Ui_MainWindow
@@ -93,6 +94,10 @@ class MainWindow(QMainWindow):
         self.experiment_timer_tiles_network_and_ssh = QTimer()
         self.experiment_timer_tiles_network_and_ssh.timeout.connect(self.updateExperimentDiagnosticsTiles)
         self.experiment_timer_tiles_network_and_ssh.start(7000)
+
+        self.experiment_timer_tiles_ros2 = QTimer()
+        self.experiment_timer_tiles_ros2.timeout.connect(self.updateExperimentDiagnosticsROS2)
+        self.experiment_timer_tiles_ros2.start(7000)
 
 
 
@@ -196,7 +201,6 @@ class MainWindow(QMainWindow):
                 enable_battery = device.get("enable_battery", False)
                 commands = device.get("commands", [])
                 nodes = device.get("nodes", [])
-                print(nodes)
 
                 device_ = Device(
                     type=device_type,
@@ -345,6 +349,13 @@ class MainWindow(QMainWindow):
         """
         """
         worker = WorkerDeviceUi(self.devices_local, self.devices_remote)
+        self.Ui_Threadpool.start(worker)
+
+
+    def updateExperimentDiagnosticsROS2(self):
+        """
+        """
+        worker = WorkerROS2Ui(self.devices_offline + self.devices_local + self.devices_remote)
         self.Ui_Threadpool.start(worker)
 
 

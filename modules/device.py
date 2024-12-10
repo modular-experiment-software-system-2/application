@@ -377,6 +377,38 @@ class WorkerDeviceUi(QRunnable):
                     pass
 
 
+class WorkerROS2Ui(QRunnable):
+    """
+    Manages threaded worker to check and update ros2 node statuses.
+    """
+    def __init__(self, devices: List[Device]):
+        """
+        """
+        super().__init__()
+        self.devices = devices
+
+
+    def run(self):
+        """
+        """
+        result = subprocess.run(
+            ["ros2", "node", "list"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        nodes = result.stdout.strip().splitlines()
+        
+        for device in self.devices:
+            for node in device.nodes:
+                text = node.node.text()
+                if text in nodes:
+                    device.ui_node_running(node)
+                else:
+                    device.ui_node_not_running(node)
+
+
 def ssh_connect(device: Device):
     """
     Establishes an SSH connection with a remote device with more-involved networking logic and diagnostics logging.
