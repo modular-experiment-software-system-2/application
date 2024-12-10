@@ -92,7 +92,6 @@ class MainWindow(QMainWindow):
         self.devices_local: List[Device] = []
         self.devices_remote: List[Device] = []
 
-
         # UI TIMERS
         self.experiment_timer_tiles_network_and_ssh = QTimer()
         self.experiment_timer_tiles_network_and_ssh.timeout.connect(self.updateExperimentDiagnosticsTiles)
@@ -107,7 +106,9 @@ class MainWindow(QMainWindow):
         self.experiment_timer_run_abort_button.start(7000)
 
 
-
+        #
+        WIDGETS.stackedWidget.setCurrentWidget(WIDGETS.diagnostics)
+        WIDGETS.btn_diagnostics.setStyleSheet(Ui_Functions.selectMenu(WIDGETS.btn_diagnostics.styleSheet()))
 
         # SHOW WINDOW
         self.show()
@@ -821,26 +822,27 @@ class Ui_Functions(MainWindow):
 
     # /////////////////////////////////////////////////////////////////////////////////
 
-    #     def selectMenu(getStyle):
-    #     select = getStyle + Settings.MENU_SELECTED_STYLESHEET
-    #     return select
+    # # SELECT
+    def selectMenu(getStyle):
+        select = getStyle + Settings.MENU_SELECTED_STYLESHEET
+        return select
 
     # # DESELECT
-    # def deselectMenu(getStyle):
-    #     deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, "")
-    #     return deselect
+    def deselectMenu(getStyle):
+        deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, "")
+        return deselect
 
-    # # START SELECTION
-    # def selectStandardMenu(self, widget):
-    #     for w in self.ui.topMenu.findChildren(QPushButton):
-    #         if w.objectName() == widget:
-    #             w.setStyleSheet(Ui_Functions.selectMenu(w.styleSheet()))
+    # START SELECTION
+    def selectStandardMenu(self, widget):
+        for w in self.ui.topMenu.findChildren(QPushButton):
+            if w.objectName() == widget:
+                w.setStyleSheet(Ui_Functions.selectMenu(w.styleSheet()))
 
-    # # RESET SELECTION
-    # def resetStyle(self, widget):
-    #     for w in self.ui.topMenu.findChildren(QPushButton):
-    #         if w.objectName() != widget:
-    #             w.setStyleSheet(Ui_Functions.deselectMenu(w.styleSheet()))
+    # RESET SELECTION
+    def resetStyle(self, widget):
+        for w in self.ui.topMenu.findChildren(QPushButton):
+            if w.objectName() != widget:
+                w.setStyleSheet(Ui_Functions.deselectMenu(w.styleSheet()))
 
 
 
@@ -905,14 +907,14 @@ class Ui_Functions(MainWindow):
 
 
 
-    # def selectMenu(getStyle):
-    #     select = getStyle + Settings.MENU_SELECTED_STYLESHEET
-    #     return select
+    def selectMenu(getStyle):
+        select = getStyle + Settings.MENU_SELECTED_STYLESHEET
+        return select
 
-    # # DESELECT
-    # def deselectMenu(getStyle):
-    #     deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, "")
-    #     return deselect
+    # DESELECT
+    def deselectMenu(getStyle):
+        deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, "")
+        return deselect
 
 
 
