@@ -11,8 +11,9 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
       - "ros2 launch vicon_driver driver.launch.py"
+    commands2:
     nodes:
       - "/vicon_driver"
   - type: "flir"
@@ -23,8 +24,10 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
       - "ros2 launch flir_driver cameras.launch.py"
+    commands2:
+      - "ros2 launch placeholder placeholder.launch.py"
     nodes:
       - "/flir1"
   - type: "flir"
@@ -35,7 +38,8 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
+    commands2:
     nodes:
       - "/flir2"
   - type: "flir"
@@ -46,7 +50,8 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
+    commands2:
     nodes:
       - "/flir3"
   - type: "flir"
@@ -57,7 +62,8 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
+    commands2:
     nodes:
       - "/flir4"
   - type: "flir"
@@ -68,7 +74,8 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
+    commands2:
     nodes:
       - "/flir5"
   - type: "flir"
@@ -79,7 +86,8 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
+    commands2:
     nodes:
       - "/flir6"
   - type: "flir"
@@ -90,7 +98,8 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
+    commands2:
     nodes:
       - "/flir7"
   - type: "flir"
@@ -101,6 +110,7 @@ Sensors:
     enable_network: true
     enable_ssh: false
     enable_battery: false
-    commands:
+    commands1:
+    commands2:
     nodes:
       - "/flir8"

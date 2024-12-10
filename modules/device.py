@@ -187,7 +187,7 @@ class Device(DeviceFunctions, DeviceUi):
     """
     Manages a mess2 app diagnostics device. 
     """
-    def __init__(self, type: str, name: str, ip: str, username: str = "ubuntu", password="1234", port: int = -1, logger: QPlainTextEdit = None, threadpool: QThreadPool = None, enable_network: bool = True, enable_ssh: bool = False, enable_battery: bool = False, commands: List[str] = [], nodes: List[str] = []):
+    def __init__(self, type: str, name: str, ip: str, username: str = "ubuntu", password="1234", port: int = -1, logger: QPlainTextEdit = None, threadpool: QThreadPool = None, enable_network: bool = True, enable_ssh: bool = False, enable_battery: bool = False, commands1: List[str] = [], commands2: List[str] = [], nodes: List[str] = []):
         """
         Initializes device attributes and shows the device in the mess2 app.
         """
@@ -218,9 +218,12 @@ class Device(DeviceFunctions, DeviceUi):
         self.threadpool = threadpool
 
         # ROS2 integrations
-        self.commands = commands        # commands to be executed by device
-        self.processes: List[subprocess.Popen] = []             # stores processes
-        self.pids: List[int] = []
+        self.commands1 = commands1      # commands to be executed by the device; i.e., motor drivers, control servers
+        self.commands2 = commands2      # commands to be executed by the device immediately before running the experiment file; i.e., logger instances
+        self.processes1: List[subprocess.Popen] = []
+        self.processes2: List[subprocess.Popen] = []
+        self.pids1: List[int] = []
+        self.pids2: List[int] = []
 
 
     def __del__(self):
@@ -514,67 +517,71 @@ class WorkerDevicesSSHDisconnect(QRunnable):
 class WorkerDeviceROS2LocalStart(QRunnable):
     """
     """
-    def __init__(self, device: Device):
+    def __init__(self, device: Device, priority: int):
         """
         """
         super().__init__()
         self.device = device
+        self.priority = priority
 
 
     def run(self):
         """
         """
-        self.device.network.local.start(self.device)
+        self.device.network.local.start(self.device, self.priority)
 
 
 class WorkerDeviceROS2LocalStop(QRunnable):
     """
     """
-    def __init__(self, device: Device):
+    def __init__(self, device: Device, priority: int):
         """
         """
         super().__init__()
         self.device = device
+        self.priority = priority
 
 
     def run(self):
         """
         """
-        self.device.network.local.stop(self.device)
+        self.device.network.local.stop(self.device, self.priority)
 
 
 class WorkerDevicesROS2LocalStart(QRunnable):
     """
     """
-    def __init__(self, devices: List[Device]):
+    def __init__(self, devices: List[Device], priority: int):
         """
         """
         super().__init__()
         self.devices = devices
+        self.priority = priority
 
 
     def run(self):
         """
         """
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(device.network.local.start, device): device for device in self.devices if device.name != "" and device.name != None}
+            futures = {executor.submit(device.network.local.start, device, self.priority): device for device in self.devices if device.name != "" and device.name != None}
 
 
 class WorkerDevicesROS2LocalStop(QRunnable):
     """
     """
-    def __init__(self, devices: List[Device]):
+    def __init__(self, devices: List[Device], priority: int):
         """
         """
         super().__init__()
         self.devices = devices
+        self.priority = priority
 
 
     def run(self):
         """
         """
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(device.network.local.stop, device): device for device in self.devices if device.name != "" and device.name != None}
+            futures = {executor.submit(device.network.local.stop, device, self.priority): device for device in self.devices if device.name != "" and device.name != None}
 
 
 class WorkerDeviceROS2RemoteStart(QRunnable):

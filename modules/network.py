@@ -134,50 +134,73 @@ class ROS2Local():
     """
     Manages ROS2 command launching and shutdown on a local device. 
     """
-    def start(self, device):
+    def start(self, device, priority: int):
         """
         Launches the command processes on the local device.
         """
-        for command in device.commands:
+        commands = []
+        if priority == 1:
+            commands = device.commands1
+        elif priority == 2:
+            commands = device.commands2
+        for command in commands:
             command_ = command.split()
             process = subprocess.Popen(command_, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setpgrp)
             device.logger.log(f"started pid {process.pid} on {device.name} \"{command}\"")
-            device.processes.append(process)
+            if priority == 1:
+                device.processes1.append(process)
+            elif priority == 2:
+                device.processes2.append(process)
 
 
-
-    def stop(self, device):
+    def stop(self, device, priority: int):
         """
         Shuts down the command processes on the local device.
         """
         removable = []
-        for process in device.processes:
+        processes = []
+        if priority == 1:
+            processes = device.processes1
+        elif priority == 2:
+            processes = device.processes2
+        for process in processes:
             os.killpg(process.pid, signal.SIGTERM)
             device.logger.log(f"stopped pid {process.pid} on {device.name}")
             removable.append(process)
         for process in removable:
-            device.processes.remove(process)
+            if priority == 1:
+                device.processes1.remove(process)
+            elif priority == 2:
+                device.processes2.remove(process)
 
 
 class ROS2Remote():
     """
     Manages ROS2 command launching and shutdown on a remote device. 
     """
-    def start(self, device):
+    def start(self, device, priority: int):
         """
         Launches the command processes on the remote device.
         """
         if not device.network.status():
             device.logger.log(f"unable to execute commands on {device.name}")
             return
-        for command in device.commands:
+        commands = []
+        if priority == 1:
+            commands = device.commands1
+        elif priority == 2:
+            commands = device.commands2
+        for command in commands:
             stdin, stdout, stderr = device.network.ssh.exec_command(f"nohup zsh -c 'source ~/.zshrc && {command} > /dev/null 2>&1' & echo $!", get_pty=False)
             pid = stdout.read().decode().strip()
             device.logger.log(f"started pid {pid} on {device.name}\"{command} \"")
-            device.pids.append(pid)
+            if priority == 1:
+                device.pids1.append(pid)
+            elif priority == 2:
+                device.pids2.append(pid)
 
 
-    def stop(self, device):
+    def stop(self, device, priority: int):
         """
         Shuts down the command processes on the remote device.
         """
@@ -185,12 +208,20 @@ class ROS2Remote():
             device.logger.log(f"unable to execute commands on {device.name}")
             return
         removable = []
-        for pid in device.pids:
+        pids = []
+        if priority == 1:
+            pids = device.pids1
+        elif priority == 2:
+            pids = device.pids2
+        for pid in pids:
             device.network.ssh.exec_command(f"pgrep -P {pid} | xargs kill -9")
             device.logger.log(f"stopped pid {pid} on {device.name}")
             removable.append(pid)
         for pid in removable:
-            device.pids.remove(pid)
+            if priority == 1:
+                device.pids1.remove(pid)
+            elif priority == 2:
+                device.pids2.remove(pid)
 
 
 class NetworkFunctions(SCP):
