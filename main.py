@@ -2,6 +2,7 @@
 from datetime import datetime
 import os
 import sys
+import time
 from typing import List
 import yaml
 
@@ -102,7 +103,7 @@ class MainWindow(QMainWindow):
         self.experiment_timer_tiles_ros2.start(7000)
 
         self.experiment_timer_run_abort_button = QTimer()
-        self.experiment_timer_run_abort_button.timeout.connect(self.clickExperimentRunAbort)
+        self.experiment_timer_run_abort_button.timeout.connect(self.updateExperimentRunAbort)
         self.experiment_timer_run_abort_button.start(7000)
 
 
@@ -371,6 +372,37 @@ class MainWindow(QMainWindow):
         """
         """
         Ui_Functions.diagnosticsConsoleLog(self, "refresh button not implemented")
+
+
+    def updateExperimentRunAbort(self):
+        """
+        """
+        # tic = time.time()
+        c1 = self.checkDevicesNetworkStatus(self.devices_local + self.devices_remote)
+        c2 = self.checkDevicesSSHStatus(self.devices_remote)
+        c3 = True
+        # devices = self.instance.devices_offline + self.instance.devices_local + self.instance.devices_remote
+        # for device in devices:
+        #     for node in device.nodes:
+        #         if node.status_not_running.text() == "not running":
+        #             c3 = False
+        # NEED TO CHANGE ^^^ METHODOLOGY SINCE IT DOES NOT ACCOUNT FOR NODES STARTED AT EXPERIMENT RUNTIME
+        if self.is_experiment_running == True:
+            pass
+        else:
+            self.ui.buttonExperimentRunAbort.setText("Run Experiment")
+            if c1 == True and c2 == True and c3 == True:
+                self.is_experiment_ready = True
+                style = WIDGETS.diagnosticsMenu2.styleSheet()
+                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_NOT_READY, Settings.DIAGNOSTICS_MENU2_IS_READY)
+                WIDGETS.diagnosticsMenu2.setStyleSheet(style)
+            else:
+                self.is_experiment_ready = False
+                style = WIDGETS.diagnosticsMenu2.styleSheet()
+                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_READY, Settings.DIAGNOSTICS_MENU2_IS_NOT_READY)
+                WIDGETS.diagnosticsMenu2.setStyleSheet(style)
+        # toc = time.time()
+        # print(toc-tic) time on marina's pc is about 0.00040149688720703125
 
 
     def clickExperimentRunAbort(self):
@@ -900,41 +932,41 @@ class Ui_Functions(MainWindow):
         self.ui.diagnosticsConsoleDisplay.verticalScrollBar().setValue(self.ui.diagnosticsConsoleDisplay.verticalScrollBar().maximum())
 
 
-class WorkerExperimentUi(QRunnable):
-    """
-    """
-    def __init__(self, instance: MainWindow):
-        """
-        """
-        self.instance = instance
+# class WorkerExperimentUi(QRunnable):
+#     """
+#     """
+#     def __init__(self, instance: MainWindow):
+#         """
+#         """
+#         self.instance = instance
     
 
-    def run(self):
-        """
-        """
-        c1 = self.instance.checkDevicesNetworkStatus(self.instance.devices_local + self.instance.devices_remote)
-        c2 = self.instance.checkDevicesSSHStatus(self.instance.devices_remote)
-        c3 = True
-        # devices = self.instance.devices_offline + self.instance.devices_local + self.instance.devices_remote
-        # for device in devices:
-        #     for node in device.nodes:
-        #         if node.status_not_running.text() == "not running":
-        #             c3 = False
-        # NEED TO CHANGE ^^^ METHODOLOGY SINCE IT DOES NOT ACCOUNT FOR NODES STARTED AT EXPERIMENT RUNTIME
-        if self.instance.is_experiment_running == True:
-            pass
-        else:
-            self.instance.ui.buttonExperimentRunAbort.setText("Run Experiment")
-            if c1 == True and c2 == True and c3 == True:
-                self.instance.is_experiment_ready = True
-                style = WIDGETS.diagnosticsMenu2.styleSheet()
-                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_NOT_READY, Settings.DIAGNOSTICS_MENU2_IS_READY)
-                WIDGETS.diagnosticsMenu2.setStyleSheet(style)
-            else:
-                self.instance.is_experiment_ready = False
-                style = WIDGETS.diagnosticsMenu2.styleSheet()
-                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_READY, Settings.DIAGNOSTICS_MENU2_IS_NOT_READY)
-                WIDGETS.diagnosticsMenu2.setStyleSheet(style)
+#     def run(self):
+#         """
+#         """
+#         c1 = self.instance.checkDevicesNetworkStatus(self.instance.devices_local + self.instance.devices_remote)
+#         c2 = self.instance.checkDevicesSSHStatus(self.instance.devices_remote)
+#         c3 = True
+#         # devices = self.instance.devices_offline + self.instance.devices_local + self.instance.devices_remote
+#         # for device in devices:
+#         #     for node in device.nodes:
+#         #         if node.status_not_running.text() == "not running":
+#         #             c3 = False
+#         # NEED TO CHANGE ^^^ METHODOLOGY SINCE IT DOES NOT ACCOUNT FOR NODES STARTED AT EXPERIMENT RUNTIME
+#         if self.instance.is_experiment_running == True:
+#             pass
+#         else:
+#             self.instance.ui.buttonExperimentRunAbort.setText("Run Experiment")
+#             if c1 == True and c2 == True and c3 == True:
+#                 self.instance.is_experiment_ready = True
+#                 style = WIDGETS.diagnosticsMenu2.styleSheet()
+#                 style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_NOT_READY, Settings.DIAGNOSTICS_MENU2_IS_READY)
+#                 WIDGETS.diagnosticsMenu2.setStyleSheet(style)
+#             else:
+#                 self.instance.is_experiment_ready = False
+#                 style = WIDGETS.diagnosticsMenu2.styleSheet()
+#                 style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_READY, Settings.DIAGNOSTICS_MENU2_IS_NOT_READY)
+#                 WIDGETS.diagnosticsMenu2.setStyleSheet(style)
 
 
 def main():
