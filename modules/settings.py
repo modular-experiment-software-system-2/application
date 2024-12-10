@@ -43,3 +43,37 @@ class Settings():
     border-top: 3px solid transparent; 
     """
 
+
+    DIAGNOSTICS_MENU2_IS_NOT_READY = """
+#buttonExperimentRunAbort  {
+color: rgb(201, 201, 201);
+background-color: rgb(35, 28, 30);
+font-size: 14px;
+min-height: 36px;
+max-height: 36px;
+border: 2px solid rgb(217, 83, 79);
+border-radius: 12px;
+}
+"""
+    DIAGNOSTICS_MENU2_IS_READY = """
+#buttonExperimentRunAbort  {
+color: rgb(201, 201, 201);
+background-color: rgb(35, 79, 61);
+font-size: 14px;
+min-height: 36px;
+max-height: 36px;
+border: 2px solid rgb(60, 179, 113);
+border-radius: 12px;
+}
+"""
+    DIAGNOSTICS_MENU2_IS_RUNNING = """
+#buttonExperimentRunAbort  {
+color: rgb(201, 201, 201);
+background-color: rgb(35, 28, 30);
+font-size: 14px;
+min-height: 36px;
+max-height: 36px;
+border: 2px solid rgb(217, 83, 79);
+border-radius: 12px;
+}
+"""

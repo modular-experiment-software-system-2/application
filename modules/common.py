@@ -14,6 +14,7 @@ from PySide6.QtCore import (
     QEvent,
     QTimer,
     QThreadPool,
+    QRunnable,
 )
 from PySide6.QtGui import (
     QBrush,

@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         # SETTINGS
         title = "mess2"
         description = "Modular Experiment Software System 2"
-        version = "v0.2.2"
+        version = "v0.2.3"
         self.setWindowTitle(title)
         WIDGETS.titleRightInfo.setText(description)
         WIDGETS.version.setText(version)
@@ -69,13 +69,15 @@ class MainWindow(QMainWindow):
         WIDGETS.buttonNetworkRemoteConnectDisconnect.clicked.connect(self.clickNetworkRemoteConnectDisconnect)
         WIDGETS.buttonROS2RemoteLaunchShutdown.clicked.connect(self.clickROS2RemoteLaunchShutdown)
         WIDGETS.buttonDiagnosticsRefresh.clicked.connect(self.clickExperimentRefresh)
+        WIDGETS.buttonExperimentRunAbort.clicked.connect(self.clickExperimentRunAbort)
 
 
         # EXPERIMENT STATE ATTRIBUTES
         self.ros2_local_status: int = 0             # 0: not active; 1: active
         self.remote_network_status: int = 0         # 0: not connected; 1: connected
         self.ros2_remote_status: int = 0            # 0: not active; 1: active
-        self.is_experiment_running: bool = False
+        self.is_experiment_running: bool = False    # state indicating whether experiment is running
+        self.is_experiment_ready: bool = False      # state indicating whether experiment satisfies criteria to run
 
         # EXPERIMENT FILE ATTRIBUTES
         self.experiment_file_extensions: str = ".yaml (*.yaml)"     # valid experiment file types
@@ -98,6 +100,10 @@ class MainWindow(QMainWindow):
         self.experiment_timer_tiles_ros2 = QTimer()
         self.experiment_timer_tiles_ros2.timeout.connect(self.updateExperimentDiagnosticsROS2)
         self.experiment_timer_tiles_ros2.start(7000)
+
+        self.experiment_timer_run_abort_button = QTimer()
+        self.experiment_timer_run_abort_button.timeout.connect(self.clickExperimentRunAbort)
+        self.experiment_timer_run_abort_button.start(7000)
 
 
 
@@ -367,6 +373,35 @@ class MainWindow(QMainWindow):
         Ui_Functions.diagnosticsConsoleLog(self, "refresh button not implemented")
 
 
+    def clickExperimentRunAbort(self):
+        """
+        """
+        if self.is_experiment_ready == True:
+            self.is_experiment_running = True
+            Ui_Functions.diagnosticsConsoleLog(self, "starting experiment")
+            style = WIDGETS.diagnosticsMenu2.styleSheet()
+            style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_READY, Settings.DIAGNOSTICS_MENU2_IS_RUNNING)
+            WIDGETS.diagnosticsMenu2.setStyleSheet(style)
+            self.ui.buttonExperimentRunAbort.setText("Terminate Experiment")
+            
+
+            Ui_Functions.diagnosticsConsoleLog(self, "EXPERIMENT RUNNING PLACEHOLDER")
+
+        elif self.is_experiment_running == True:
+            self.is_experiment_running = False
+            Ui_Functions.diagnosticsConsoleLog(self, "terminating experiment")
+            style = WIDGETS.diagnosticsMenu2.styleSheet()
+            style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_RUNNING, Settings.DIAGNOSTICS_MENU2_IS_NOT_READY)
+            WIDGETS.diagnosticsMenu2.setStyleSheet(style)
+            self.ui.buttonExperimentRunAbort.setText("Run Experiment")
+
+            Ui_Functions.diagnosticsConsoleLog(self, "EXPERIMENT RUNNING PLACEHOLDER")
+
+        elif self.is_experiment_ready == False:
+            Ui_Functions.diagnosticsConsoleLog(self, "unable to run experiment before experiment is ready")
+
+
+
 class Ui_Content():
     """
     """
@@ -434,8 +469,6 @@ class Ui_Content():
                     self.select()
                 else:
                     content.deselect()
-
-
 
 
 class Ui_ContentGrid():
@@ -763,62 +796,62 @@ class Ui_Functions(MainWindow):
 
 
     
-    def selectStyleDiagnosticsSubMenu2(getStyle):
-        """
+    # def selectStyleDiagnosticsSubMenu2(getStyle):
+    #     """
         
-        """
-        select = getStyle + Settings.MENU_SELECTED_STYLESHEET_DIAGNOSTICS2
-        return select
-        # # select = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, Settings.DIAGNOSTICS_SUBMENU2_STYLESHEET_SELECTED)
-        # # print(select)
-        # return select
+    #     """
+    #     select = getStyle + Settings.MENU_SELECTED_STYLESHEET_DIAGNOSTICS2
+    #     return select
+    #     # # select = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, Settings.DIAGNOSTICS_SUBMENU2_STYLESHEET_SELECTED)
+    #     # # print(select)
+    #     # return select
 
 
-    def deselectStyleDiagnosticsSubMenu2(getStyle):
-        """
+    # def deselectStyleDiagnosticsSubMenu2(getStyle):
+    #     """
         
-        """
-        deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET_DIAGNOSTICS2, "")
-        return deselect
+    #     """
+    #     deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET_DIAGNOSTICS2, "")
+    #     return deselect
 
     
-    def resetStyleDiagnosticsSubMenu2(self, btnName: str):
-        """
+    # def resetStyleDiagnosticsSubMenu2(self, btnName: str):
+    #     """
         
-        """
-        ignore = ["btn_diagnostics_refresh"]
-        for w in self.ui.diagnosticsSubMenu2.findChildren(QPushButton):
-            is_same: bool = (w.objectName() == btnName)
-            is_ignore: bool = (w.objectName() in ignore)
-            if not is_same and not is_ignore:
-                w.setStyleSheet(Ui_Functions.deselectStyleDiagnosticsSubMenu2(w.styleSheet()))
+    #     """
+    #     ignore = ["btn_diagnostics_refresh"]
+    #     for w in self.ui.diagnosticsSubMenu2.findChildren(QPushButton):
+    #         is_same: bool = (w.objectName() == btnName)
+    #         is_ignore: bool = (w.objectName() in ignore)
+    #         if not is_same and not is_ignore:
+    #             w.setStyleSheet(Ui_Functions.deselectStyleDiagnosticsSubMenu2(w.styleSheet()))
     
 
 
 
 
-    def toggleStyleConnected(self, frameName, frameBool: bool):
-        """
-        """
-        frame = eval(f"self.ui.{frameName}")
-        style = frame.styleSheet()
-        if frameBool:
-            style = style.replace("disconnected", "connected")
-        else:
-            style = style.replace("connected", "disconnected")
-        frame.setStyleSheet(style)
+    # def toggleStyleConnected(self, frameName, frameBool: bool):
+    #     """
+    #     """
+    #     frame = eval(f"self.ui.{frameName}")
+    #     style = frame.styleSheet()
+    #     if frameBool:
+    #         style = style.replace("disconnected", "connected")
+    #     else:
+    #         style = style.replace("connected", "disconnected")
+    #     frame.setStyleSheet(style)
     
 
-    def toggleStyleOnline(self, frameName: str, frameBool: bool):
-        """
-        """
-        frame = eval(f"self.ui.{frameName}")
-        style = frame.styleSheet()
-        if frameBool:
-            style = style.replace("offline", "online")
-        else:
-            style = style.replace("online", "offline")
-        frame.setStyleSheet(style)
+    # def toggleStyleOnline(self, frameName: str, frameBool: bool):
+    #     """
+    #     """
+    #     frame = eval(f"self.ui.{frameName}")
+    #     style = frame.styleSheet()
+    #     if frameBool:
+    #         style = style.replace("offline", "online")
+    #     else:
+    #         style = style.replace("online", "offline")
+    #     frame.setStyleSheet(style)
 
 
 
@@ -837,24 +870,24 @@ class Ui_Functions(MainWindow):
     # ///////////////////////////////////////////////////////////////
     # END - GUI DEFINITIONS
 
-    def diagnostics_submenu2_style(self, name: str):
-        """
-        """
-        ignore = ["btn_diagnostics2_refresh"]
-        for widget in self.ui.diagnosticsSubmenu2.findChildren(QPushButton):
-            is_same: bool = (widget.objectName() == name)
-            is_ignore: bool = (widget.objectName() in ignore)
-            if is_same == False and is_ignore == False:
-                style = widget.styleSheet()
-                style = style.replace(Settings.DIAGNOSTICS_SUBMENU2_STYLE, "")
-                widget.setStyleSheet(style)
-            elif is_same == True:
-                style = widget.styleSheet()
-                style = style.replace("", Settings.DIAGNOSTICS_SUBMENU2_STYLE)
-                widget.setStyleSheet(style)
+    # def diagnostics_submenu2_style(self, name: str):
+    #     """
+    #     """
+    #     ignore = ["btn_diagnostics2_refresh"]
+    #     for widget in self.ui.diagnosticsSubmenu2.findChildren(QPushButton):
+    #         is_same: bool = (widget.objectName() == name)
+    #         is_ignore: bool = (widget.objectName() in ignore)
+    #         if is_same == False and is_ignore == False:
+    #             style = widget.styleSheet()
+    #             style = style.replace(Settings.DIAGNOSTICS_SUBMENU2_STYLE, "")
+    #             widget.setStyleSheet(style)
+    #         elif is_same == True:
+    #             style = widget.styleSheet()
+    #             style = style.replace("", Settings.DIAGNOSTICS_SUBMENU2_STYLE)
+    #             widget.setStyleSheet(style)
 
-                page = self.ui.diagnosticsPages2.findChild(QWidget, f"{widget.objectName().replace('btn', 'page')}")
-                self.ui.diagnosticsPages2.setCurrentWidget(page)
+    #             page = self.ui.diagnosticsPages2.findChild(QWidget, f"{widget.objectName().replace('btn', 'page')}")
+    #             self.ui.diagnosticsPages2.setCurrentWidget(page)
     
 
     def diagnosticsConsoleLog(self, message: str):
@@ -865,6 +898,43 @@ class Ui_Functions(MainWindow):
         ms = f"{stamp} : {message}"
         self.ui.diagnosticsConsoleDisplay.appendPlainText(ms)
         self.ui.diagnosticsConsoleDisplay.verticalScrollBar().setValue(self.ui.diagnosticsConsoleDisplay.verticalScrollBar().maximum())
+
+
+class WorkerExperimentUi(QRunnable):
+    """
+    """
+    def __init__(self, instance: MainWindow):
+        """
+        """
+        self.instance = instance
+    
+
+    def run(self):
+        """
+        """
+        c1 = self.instance.checkDevicesNetworkStatus(self.instance.devices_local + self.instance.devices_remote)
+        c2 = self.instance.checkDevicesSSHStatus(self.instance.devices_remote)
+        c3 = True
+        # devices = self.instance.devices_offline + self.instance.devices_local + self.instance.devices_remote
+        # for device in devices:
+        #     for node in device.nodes:
+        #         if node.status_not_running.text() == "not running":
+        #             c3 = False
+        # NEED TO CHANGE ^^^ METHODOLOGY SINCE IT DOES NOT ACCOUNT FOR NODES STARTED AT EXPERIMENT RUNTIME
+        if self.instance.is_experiment_running == True:
+            pass
+        else:
+            self.instance.ui.buttonExperimentRunAbort.setText("Run Experiment")
+            if c1 == True and c2 == True and c3 == True:
+                self.instance.is_experiment_ready = True
+                style = WIDGETS.diagnosticsMenu2.styleSheet()
+                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_NOT_READY, Settings.DIAGNOSTICS_MENU2_IS_READY)
+                WIDGETS.diagnosticsMenu2.setStyleSheet(style)
+            else:
+                self.instance.is_experiment_ready = False
+                style = WIDGETS.diagnosticsMenu2.styleSheet()
+                style = style.replace(Settings.DIAGNOSTICS_MENU2_IS_READY, Settings.DIAGNOSTICS_MENU2_IS_NOT_READY)
+                WIDGETS.diagnosticsMenu2.setStyleSheet(style)
 
 
 def main():
