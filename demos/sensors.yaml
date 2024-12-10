@@ -1,0 +1,106 @@
+experiment:
+  name: "Sensor Data Collection Demo"
+  categories:
+    - "Sensors"
+Sensors:
+  - type: "vicon"
+    name: "VICON Valkyrie Motion Capture System"
+    ip: "192.168.0.11"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+      - "ros2 launch vicon_driver driver.launch.py"
+    nodes:
+      - "/vicon_driver"
+  - type: "flir"
+    name: "FLIR 1"
+    ip: "192.168.0.21"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+      - "ros2 launch flir_driver cameras.launch.py"
+    nodes:
+      - "/flir1"
+  - type: "flir"
+    name: "FLIR 2"
+    ip: "192.168.0.22"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+    nodes:
+      - "/flir2"
+  - type: "flir"
+    name: "FLIR 3"
+    ip: "192.168.0.23"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+    nodes:
+      - "/flir3"
+  - type: "flir"
+    name: "FLIR 4"
+    ip: "192.168.0.24"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+    nodes:
+      - "/flir4"
+  - type: "flir"
+    name: "FLIR 5"
+    ip: "192.168.0.25"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+    nodes:
+      - "/flir5"
+  - type: "flir"
+    name: "FLIR 6"
+    ip: "192.168.0.26"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+    nodes:
+      - "/flir6"
+  - type: "flir"
+    name: "FLIR 7"
+    ip: "192.168.0.27"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+    nodes:
+      - "/flir7"
+  - type: "flir"
+    name: "FLIR 8"
+    ip: "192.168.0.28"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands:
+    nodes:
+      - "/flir8"
