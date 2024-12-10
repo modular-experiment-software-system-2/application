@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         WIDGETS.buttonROS2LocalLaunchShutdown.clicked.connect(self.clickROS2LocalLaunchShutdown)
         WIDGETS.buttonNetworkRemoteConnectDisconnect.clicked.connect(self.clickNetworkRemoteConnectDisconnect)
         WIDGETS.buttonROS2RemoteLaunchShutdown.clicked.connect(self.clickROS2RemoteLaunchShutdown)
-
+        WIDGETS.buttonDiagnosticsRefresh.clicked.connect(self.clickExperimentRefresh)
 
 
         # EXPERIMENT STATE ATTRIBUTES
@@ -166,7 +166,7 @@ class MainWindow(QMainWindow):
             self.devices_offline.clear()
             self.devices_local.clear()
             self.devices_remote.clear()
-            Ui_Functions.diagnosticsConsoleLog(self, f"unloaded experiment {self.experiment_name}")
+            Ui_Functions.diagnosticsConsoleLog(self, f"unloaded experiment \"{self.experiment_name}\"")
 
 
     def loadExperimentFile(self, file):
@@ -181,7 +181,7 @@ class MainWindow(QMainWindow):
             Ui_Functions.diagnosticsConsoleLog(self, "selected experiment file is already loaded")
             return
 
-        if file != None and exp_name != self.experiment_name:
+        if file != None and exp_name != self.experiment_name and self.experiment_name != None:
             self.unloadExperimentFile()
 
         counter = 0
@@ -234,7 +234,7 @@ class MainWindow(QMainWindow):
             if counter == 1:
                 content.select()
         
-        Ui_Functions.diagnosticsConsoleLog(self, f"loaded experiment {self.experiment_name}")
+        Ui_Functions.diagnosticsConsoleLog(self, f"loaded experiment \"{self.experiment_name}\"")
 
 
     def clickExperimentLoad(self):
@@ -359,6 +359,12 @@ class MainWindow(QMainWindow):
         """
         worker = WorkerROS2Ui(self.devices_offline + self.devices_local + self.devices_remote)
         self.Ui_Threadpool.start(worker)
+
+
+    def clickExperimentRefresh(self):
+        """
+        """
+        Ui_Functions.diagnosticsConsoleLog(self, "refresh button not implemented")
 
 
 class Ui_Content():
