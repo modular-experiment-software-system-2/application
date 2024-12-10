@@ -9,11 +9,12 @@ from modules.network import NetworkFunctions
 from modules.other.ui_tileDiagnosticsSensor import Ui_tileDiagnosticsSensor
 from modules.other.ui_tileDiagnosticsUGV import Ui_tileDiagnosticsUGV
 from modules.other.ui_tileDiagnosticsUAV import Ui_tileDiagnosticsUAV
+from modules.other.ui_tileDiagnosticsLine import Ui_tileDiagnosticsROS2Line
 import subprocess
 from typing import List, Union
 
 
-class DeviceUI():
+class DeviceUi():
     """
     Manages the ui attributes and methods for a mess2 app diagnostics instance.
     """
@@ -182,16 +183,16 @@ class DeviceFunctions():
         self.network = NetworkFunctions()
 
 
-class Device(DeviceFunctions, DeviceUI):
+class Device(DeviceFunctions, DeviceUi):
     """
     Manages a mess2 app diagnostics device. 
     """
-    def __init__(self, type: str, name: str, ip: str, username: str = "ubuntu", password="1234", port: int = -1, logger: QPlainTextEdit = None, threadpool: QThreadPool = None, enable_network: bool = True, enable_ssh: bool = False, enable_battery: bool = False, commands: List = []):
+    def __init__(self, type: str, name: str, ip: str, username: str = "ubuntu", password="1234", port: int = -1, logger: QPlainTextEdit = None, threadpool: QThreadPool = None, enable_network: bool = True, enable_ssh: bool = False, enable_battery: bool = False, commands: List[str] = [], nodes: List[str] = []):
         """
         Initializes device attributes and shows the device in the mess2 app.
         """
         DeviceFunctions.__init__(self)
-        DeviceUI.__init__(self)
+        DeviceUi.__init__(self)
 
         # device discriminators
         self.type = type
@@ -209,7 +210,8 @@ class Device(DeviceFunctions, DeviceUI):
         self.enable_battery = enable_battery
 
         # device visual information
-        self.ui_draw()
+        self.nodes = []
+        self.ui_draw(nodes)
 
         #
         self.logger = Ui_Logger(logger)
@@ -226,10 +228,9 @@ class Device(DeviceFunctions, DeviceUI):
         Safely destroys the device by closing any active SSH connections.
         """
         self.network.disconnect()
-        
-        
 
-    def ui_draw(self):
+
+    def ui_draw(self, nodes: List[str]):
         """
         """
         self.widget.setObjectName(f"{self.type}_{self.name.replace(' ', '_').replace('.', '_')}")
@@ -256,6 +257,21 @@ class Device(DeviceFunctions, DeviceUI):
             
             self.set_ip_text(self.ip)
             self.ui.nodesLayout.setAlignment(Qt.AlignTop)
+        
+        counter = 1
+        for node in nodes:
+            if counter > 3:
+                break
+            widget = QWidget()
+            widget.setObjectName(f"line{counter}")
+            ui = Ui_tileDiagnosticsROS2Line()
+            ui.setupUi(widget)
+            ui.node.setText(node)
+            ui.status_running.setText("")
+            self.ui.nodesLayout.addWidget(widget, counter, 1)
+            self.ui.nodesLayout.setAlignment(Qt.AlignTop)
+            self.nodes.append(ui)
+            counter += 1
 
 
     def ui_redraw(self, battery_percentage_text: str = None, battery_percentage_value: float = None, status_ssh: bool = None, status_network: bool = None):
@@ -283,6 +299,20 @@ class Device(DeviceFunctions, DeviceUI):
                 self.network.status_network = status_network
 
 
+    def ui_node_running(self, ui: Ui_tileDiagnosticsROS2Line):
+        """
+        """
+        ui.status_running.setText("running")
+        ui.status_not_running.setText("")
+
+
+    def ui_node_not_running(self, ui: Ui_tileDiagnosticsROS2Line):
+        """
+        """
+        ui.status_running.setText("")
+        ui.status_not_running.setText("not running")
+
+
     def click_ssh(self):
         """
         """
@@ -293,7 +323,7 @@ class Device(DeviceFunctions, DeviceUI):
         self.threadpool.start(worker)
 
 
-class WorkerDeviceUI(QRunnable):
+class WorkerDeviceUi(QRunnable):
     """
     Manages threaded worker to check and update network connection icons.
     """

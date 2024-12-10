@@ -15,6 +15,8 @@ from modules.device import (
     WorkerDevicesSSHDisconnect,
     WorkerDevicesROS2RemoteStart,
     WorkerDevicesROS2RemoteStop,
+    WorkerDeviceUi,
+
 )
 from modules.ui import Ui_MainWindow
 from modules.other.ui_tileDiagnosticsPage import Ui_tileDiagnosticsPage
@@ -42,8 +44,10 @@ class MainWindow(QMainWindow):
         # SETTINGS
         title = "mess2"
         description = "Modular Experiment Software System 2"
+        version = "v0.2.2"
         self.setWindowTitle(title)
         WIDGETS.titleRightInfo.setText(description)
+        WIDGETS.version.setText(version)
 
         Ui_Functions.uiDefinitions(self)
 
@@ -85,9 +89,28 @@ class MainWindow(QMainWindow):
         self.devices_remote: List[Device] = []
 
 
+        # UI TIMERS
+        self.experiment_timer_tiles_network_and_ssh = QTimer()
+        self.experiment_timer_tiles_network_and_ssh.timeout.connect(self.updateExperimentDiagnosticsTiles)
+        self.experiment_timer_tiles_network_and_ssh.start(7000)
+
+
+
 
         # SHOW WINDOW
         self.show()
+        Ui_Functions.diagnosticsConsoleLog(self, "launched mess2")
+
+
+    def resizeEvent(self, event):
+        """
+        """
+        Ui_Functions.resize_grips(self)
+
+    def mousePressEvent(self, event):
+        """
+        """
+        self.dragPos = event.globalPos()
     
 
     def clickExperimentSelect(self):
@@ -172,6 +195,8 @@ class MainWindow(QMainWindow):
                 enable_ssh = device.get("enable_ssh", False)
                 enable_battery = device.get("enable_battery", False)
                 commands = device.get("commands", [])
+                nodes = device.get("nodes", [])
+                print(nodes)
 
                 device_ = Device(
                     type=device_type,
@@ -184,7 +209,8 @@ class MainWindow(QMainWindow):
                     enable_network=enable_network,
                     enable_ssh=enable_ssh,
                     enable_battery=enable_battery,
-                    commands=commands
+                    commands=commands,
+                    nodes=nodes,
                 )
 
                 if enable_network == False:
@@ -313,7 +339,13 @@ class MainWindow(QMainWindow):
             self.threadpool.start(worker)
             WIDGETS.buttonROS2RemoteLaunchShutdown.setText("Launch Remote ROS2 Nodes")
             self.ros2_remote_status = 0
-        
+
+
+    def updateExperimentDiagnosticsTiles(self):
+        """
+        """
+        worker = WorkerDeviceUi(self.devices_local, self.devices_remote)
+        self.Ui_Threadpool.start(worker)
 
 
 class Ui_Content():
