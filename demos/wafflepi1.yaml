@@ -1,0 +1,35 @@
+experiment:
+  name: "Wafflepi1 Node List"
+  categories:
+    - "Sensors"
+    - "UGVs"
+Sensors:
+  - type: "vicon"
+    name: "VICON Valkyrie Motion Capture System"
+    ip: "192.168.0.11"
+    username: ""
+    password: ""
+    enable_network: true
+    enable_ssh: false
+    enable_battery: false
+    commands1:
+      - "ros2 launch vicon_driver driver.launch.py"
+    commands2:
+    nodes:
+      - "/vicon"
+UGVs:
+  - type: "turtlebot3"
+    name: "Wafflepi1"
+    ip: "192.168.0.26"
+    username: "ubuntu"
+    password: "1234"
+    enable_network: true
+    enable_ssh: true
+    enable_battery: false
+    commands1:
+      - "ros2 launch turtlebot3_driver robot.launch.py name:=wafflepi1"
+      # - "ros2 launch ros2_differential_drive_line_following waffle.launch.py name:=wafflepi1"
+    commands2:
+    nodes:
+      - "/wafflepi1/turtlebot3_node"
+      - "/wafflepi1/diff_drive_controller"

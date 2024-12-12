@@ -15,36 +15,36 @@ Sensors:
       - "ros2 launch vicon_driver driver.launch.py"
     commands2:
     nodes:
-      - "/vicon_driver"
+      - "/vicon"
   - type: "flir"
     name: "FLIR 1"
-    ip: "192.168.0.21"
+    ip: "192.168.0.101"
     username: ""
     password: ""
     enable_network: true
     enable_ssh: false
     enable_battery: false
     commands1:
-      - "ros2 launch flir_driver cameras.launch.py"
+      - "ros2 launch spinnaker_camera_driver cameras.launch.py"
     commands2:
-      - "ros2 launch placeholder placeholder.launch.py"
+      - "ros2 launch mess2_logger_cpp template.launch.py dir_logs:=PARAMETER_DIR_LOGS"
     nodes:
       - "/flir1"
-  - type: "flir"
-    name: "FLIR 2"
-    ip: "192.168.0.22"
-    username: ""
-    password: ""
-    enable_network: true
-    enable_ssh: false
-    enable_battery: false
-    commands1:
-    commands2:
-    nodes:
-      - "/flir2"
+  # - type: "flir"
+  #   name: "FLIR 2"
+  #   ip: "192.168.0.102"
+  #   username: ""
+  #   password: ""
+  #   enable_network: true
+  #   enable_ssh: false
+  #   enable_battery: false
+  #   commands1:
+  #   commands2:
+  #   nodes:
+  #     - "/flir2"
   - type: "flir"
     name: "FLIR 3"
-    ip: "192.168.0.23"
+    ip: "192.168.0.103"
     username: ""
     password: ""
     enable_network: true
@@ -56,7 +56,7 @@ Sensors:
       - "/flir3"
   - type: "flir"
     name: "FLIR 4"
-    ip: "192.168.0.24"
+    ip: "192.168.0.104"
     username: ""
     password: ""
     enable_network: true
@@ -68,7 +68,7 @@ Sensors:
       - "/flir4"
   - type: "flir"
     name: "FLIR 5"
-    ip: "192.168.0.25"
+    ip: "192.168.0.105"
     username: ""
     password: ""
     enable_network: true
@@ -80,7 +80,7 @@ Sensors:
       - "/flir5"
   - type: "flir"
     name: "FLIR 6"
-    ip: "192.168.0.26"
+    ip: "192.168.0.106"
     username: ""
     password: ""
     enable_network: true
@@ -92,7 +92,7 @@ Sensors:
       - "/flir6"
   - type: "flir"
     name: "FLIR 7"
-    ip: "192.168.0.27"
+    ip: "192.168.0.107"
     username: ""
     password: ""
     enable_network: true
@@ -102,15 +102,15 @@ Sensors:
     commands2:
     nodes:
       - "/flir7"
-  - type: "flir"
-    name: "FLIR 8"
-    ip: "192.168.0.28"
-    username: ""
-    password: ""
-    enable_network: true
-    enable_ssh: false
-    enable_battery: false
-    commands1:
-    commands2:
-    nodes:
-      - "/flir8"
+  # - type: "flir"
+  #   name: "FLIR 8"
+  #   ip: "192.168.0.108"
+  #   username: ""
+  #   password: ""
+  #   enable_network: true
+  #   enable_ssh: false
+  #   enable_battery: false
+  #   commands1:
+  #   commands2:
+  #   nodes:
+  #     - "/flir8"

@@ -1,3 +1,8 @@
+
+import datetime
+import os
+import re
+
 class Settings():
     # APP SETTINGS
     # ///////////////////////////////////////////////////////////////
@@ -77,3 +82,26 @@ border: 2px solid rgb(217, 83, 79);
 border-radius: 12px;
 }
 """
+
+
+    def get_experiment_trial_path(path):
+        """
+        """
+        expanded_path = os.path.expanduser(f"~/{path}")
+        if not os.path.exists(expanded_path):
+            os.makedirs(expanded_path)
+            return "0001"
+        past_trials = [name for name in os.listdir(expanded_path) if os.path.isdir(os.path.join(expanded_path, name))]
+        last_index = 0
+        for trial in past_trials:
+            match = re.match(r'^(\d+)_', trial)
+            if match:
+                index = int(match.group(1))
+                if index > last_index:
+                    last_index = index
+        curr_index = last_index + 1
+        trial = f"{curr_index:04d}"
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        time = datetime.datetime.now().strftime("%H:%M:%S")
+        return f"{path}/{trial}_{date}_{time}"
+        

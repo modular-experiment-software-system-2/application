@@ -89,6 +89,7 @@ class MainWindow(QMainWindow):
         self.experiment_name: str = None            # name of the experiment
         self.experiment_commands: List[str] = []    # list of experiment commands (to be executed after device commands1 and commands2); please note that these are ONLY commands that should run on the LOCAL DESKTOP MACHINE RUNNING MESS2
         self.experiment_processes: List[subprocess.Popen] = []      # list of processes from the experiment_commands
+        self.experiment_file_name: str = None       # name of the selected experiment file
 
         # EXPERIMENT BACKEND
         self.experiment_section: List[Ui_Content] = []
@@ -208,6 +209,7 @@ class MainWindow(QMainWindow):
 
         counter = 0
         self.experiment_name = exp_name
+        self.experiment_file_name = os.path.splitext(os.path.basename(self.experiment_file_path))[0]
         # self.experiment_commands = exp_commands
         for cat in exp_categories:
             content = Ui_Content(self, cat)
@@ -334,7 +336,7 @@ class MainWindow(QMainWindow):
             Ui_Functions.diagnosticsConsoleLog(self, "connecting to remote devices")
             worker = WorkerDevicesSSHConnect(self.devices_remote)
             self.threadpool.start(worker)
-            WIDGETS.buttonNetworkRemoteConnectDisconnect.setText("Disconnect from Remote Devices")
+            WIDGETS.buttonNetworkRemoteConnectDisconnect.setText("Disconnect Remote Devices")
             self.remote_network_status = 1
         elif self.remote_network_status == 1:
             Ui_Functions.diagnosticsConsoleLog(self, "disconnecting from remote devices")
@@ -430,6 +432,20 @@ class MainWindow(QMainWindow):
             WIDGETS.diagnosticsMenu2.setStyleSheet(style)
             self.ui.buttonExperimentRunAbort.setText("Terminate Experiment")
 
+            # get experiment log path
+            self.experiment_log_path = f"Desktop/logs/{self.experiment_file_name}"
+            self.experiment_log_path = f'"{Settings.get_experiment_trial_path(self.experiment_log_path)}"'
+                            # add method to load commands with parameters from experiment file ?
+            for device in self.devices_offline:
+                if device.commands2 != None:
+                    device.commands2 = [command.replace("PARAMETER_DIR_LOGS", self.experiment_log_path) for command in device.commands2]
+            for device in self.devices_local:
+                if device.commands2 != None:
+                    device.commands2 = [command.replace("PARAMETER_DIR_LOGS", self.experiment_log_path) for command in device.commands2]
+            # for device in self.devices_remote:
+            #     device.commands2 = [command.replace('PARAMETER_DIR_LOGS', self.experiment_log_path) for command in device.commands2]
+            # remote machines always log to ~/logs
+
             Ui_Functions.diagnosticsConsoleLog(self, "starting local ros2 experiment nodes")
             worker = WorkerDevicesROS2LocalStart(self.devices_local, 2)
             self.threadpool.start(worker)
@@ -469,6 +485,13 @@ class MainWindow(QMainWindow):
                 removable.append(process)
             for process in removable:
                 self.experiment_processes.remove(process)
+            
+            for device in self.devices_offline:
+                if device.commands2 != None:
+                    device.commands2 = [command.replace(self.experiment_log_path, "PARAMETER_DIR_LOGS") for command in device.commands2]
+            for device in self.devices_local:
+                if device.commands2 != None:
+                    device.commands2 = [command.replace(self.experiment_log_path, "PARAMETER_DIR_LOGS") for command in device.commands2]
 
         elif self.is_experiment_ready == False:
             Ui_Functions.diagnosticsConsoleLog(self, "unable to run experiment before experiment is ready")

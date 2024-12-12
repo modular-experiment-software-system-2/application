@@ -9,8 +9,8 @@ experiment:
   #       - topics: "['/turtle1/cmd_vel', '/turtle1/color_sensor', '/turtle1/pose']"
 Fake:
   - type: "pc"
-    name: "Marina's PC"
-    ip: "192.168.1.168"
+    name: "user's pc"
+    ip: "127.0.0.1"
     username: ""
     password: ""
     enable_network: true
